@@ -214,3 +214,5 @@ def astar_draw_node(window, node: Node):
 
     
     #pygame.draw.circle(window, node_color, (nodeX, config.HEIGHT - nodeY), 3)
+
+
