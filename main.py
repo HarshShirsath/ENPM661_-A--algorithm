@@ -101,3 +101,20 @@ while isRunning:
             mouseX, mouseY = pygame.mouse.get_pos()
             if start_set and not orientation_set:
                 orientation = math.atan2(mouseY - start_point[1],mouseX - start_point[0])
+
+        if not isRunning:
+            break
+
+display.fill(config.BACKGROUND)
+draw_obstacles()
+draw_start_goal_orientation()
+if start_set and goal_set and not a_star.is_initialized():
+    a_star.astar_init(start_point, goal_point,orientation,world_threshold)
+
+a_star.astar_update()
+a_star.astar_backtrack()
+a_star.astar_draw(display)
+pygame.display.update()
+
+pygame.quit()
+sys.exit()

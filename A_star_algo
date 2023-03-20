@@ -1,0 +1,89 @@
+from enum import Enum
+import math
+import config
+import pygame
+
+
+class State(Enum):
+    NONE = 0
+    INIT = 1
+    UPDATE = 2
+    BACKTRACK = 3
+    FAILED = 4
+
+class Node:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.angle = 0
+        self.visited = False
+        self.g_cost = math.inf
+        self.f_cost = math.inf
+        self.color = config.GRAY
+        self.cameFrom = None
+
+    def __str__(self):
+        return f"x:{self.x}, y:{self.y}, angle:{self.angle}, visited:{self.visited}, [g:{self.g_cost}, f:{self.f_cost}]"
+
+currentState = State.NONE
+
+open_list:Node = []
+closed_list = []
+
+astar_start = (0, 0)
+astar_goal = (0, 0)
+astar_threshold = 1
+
+nodes: Node = []
+
+
+def astar_reset():
+    global currentState
+    currentState = State.NONE
+
+def is_initialized():
+    global currentState
+    return currentState.value > State.NONE.value
+
+def world_to_region(x,y):
+    global astar_threshold
+    gridX = math.floor(x / astar_threshold)
+    gridY = math.floor(y / astar_threshold)
+    return (gridX,gridY) 
+
+def astar_init(start_point, goal_point, orientation, threshold = 1):
+    global currentState
+    global astar_start
+    global astar_goal
+    global astar_threshold
+    global nodes
+
+    if (currentState != State.NONE):
+        print("Reset the astar algorithm before initializing. Aborting")
+        return
+    print("AStar Initialized")
+    astar_start = start_point
+    astar_goal = goal_point
+    # initial world
+    threshold = 10
+    astar_threshold = threshold
+    cols = math.ceil(config.WIDTH / threshold)
+    rows = math.ceil(config.HEIGHT / threshold)
+    for y in range(rows):
+        nodes.append([])
+        for x in range(cols):
+            nodes[y].append(Node(x,y))
+
+    # Set the start node and add it to open list and what not.
+    idxX,idxY = world_to_region(start_point[0],config.HEIGHT - start_point[1]) 
+    print(len(nodes))
+    print(len(nodes[0]))
+    print((idxX,idxY))
+
+    nodes[idxY][idxX].angle = orientation
+    nodes[idxY][idxX].g_cost = 0
+    nodes[idxY][idxX].f_cost = heuristic(nodes[idxY][idxX])
+    open_list.append(nodes[idxY][idxX])
+    currentState = State.UPDATE
+
