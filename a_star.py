@@ -158,23 +158,22 @@ def explore_nodes(node: Node, step_size):
     
     nodeX, nodeY = region_to_world(node.x, node.y)
     print(f"processing neighbors of x:{node.x}, y:{node.y}, angle:{node.angle}")
+
+    new_x = nodeX + step_size 
+    new_y = nodeY + step_size 
     for k in range(-2, 2):
-        new_angle = node.angle + k * math.radians(30)
-        new_x = nodeX + step_size * math.cos(new_angle)
-        new_y = nodeY + step_size * math.sin(new_angle)
-                
         print(f"neighbors at angle {k * 30} is x:{new_x}, y:{new_y}")
         edge_cost = math.fabs(k)
 
-        tentative_g_cost = node.g_cost + edge_cost
-        neighborX, neighborY = world_to_region(new_x, new_y)
-        if (neighborX > config.WIDTH or neighborX < 0) or (neighborY > config.HEIGHT or neighborY < 0):
-            continue
+    tentative_g_cost = node.g_cost + edge_cost
+    neighborX, neighborY = world_to_region(new_x, new_y)
+    if (neighborX > config.WIDTH or neighborX < 0) or (neighborY > config.HEIGHT or neighborY < 0):
+    
             
         neighbor = nodes[neighborY][neighborX]
         if (tentative_g_cost < neighbor.g_cost):
             nodes[neighborY][neighborX].cameFrom = node
-            nodes[neighborY][neighborX].angle = new_angle
+            # nodes[neighborY][neighborX].angle = new_angle
             nodes[neighborY][neighborX].g_cost = tentative_g_cost
             nodes[neighborY][neighborX].f_cost = tentative_g_cost + heuristic(
                 nodes[neighborY][neighborX])
