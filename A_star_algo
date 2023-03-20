@@ -87,3 +87,88 @@ def astar_init(start_point, goal_point, orientation, threshold = 1):
     open_list.append(nodes[idxY][idxX])
     currentState = State.UPDATE
 
+def astar_update():
+    global currentState
+    global open_list
+    global closed_list
+    
+    if (currentState != State.UPDATE):
+        return
+
+    if len(open_list) == 0:
+        currentState = State.FAILED
+        return
+
+    currIndex = 0
+    for i in range(len(open_list)):
+       if(open_list[i].f_cost < open_list[currIndex].f_cost):
+           currIndex = i
+    print(open_list)
+    current = open_list[currIndex]
+    if(current.x == astar_goal[0] and current.y == astar_goal[1]):
+        currentState = State.BACKTRACK
+        return
+
+    del open_list[currIndex]
+    
+    nodes[current.y][current.x].visited = True
+    closed_list.append(current)
+    explore_nodes(current,config.STEP_SIZE) 
+    
+def astar_backtrack():
+    global currentState
+    if (currentState != State.BACKTRACK):
+        return
+
+    # Now we either have a path that needs to be backtracked to the start. Or the algorithm has exited in unfavorable conditions.
+    # YOUR CODE HERE
+
+
+def heuristic(node):
+    global astar_goal
+    dX = astar_goal[0] - node.x
+    dY = astar_goal[1] - node.y
+
+    # because all the distances would be in squares, it wouldn't matter
+    return dX**2 + dY**2
+
+
+def explore_nodes(node: Node, step_size):
+    global nodes
+    new_points = []
+    for k in range(-2, 2):
+        new_angle = node.angle + k * math.radians(30)
+        new_x = node.x + step_size * math.cos(new_angle)
+        new_y = node.y + step_size * math.sin(new_angle)
+
+        new_points.append((new_x, new_y))
+        edge_cost = math.fabs(k)
+
+        tentative_g_cost = node.g_cost + edge_cost
+        neighborX, neighborY = world_to_region(new_x,new_y)
+        neighbor = nodes[neighborY][neighborX]
+        if(tentative_g_cost < neighbor.g_cost):
+            nodes[neighborY][neighborX].cameFrom = node
+            nodes[neighborY][neighborX].g_cost = tentative_g_cost
+            nodes[neighborY][neighborX].f_cost = tentative_g_cost + heuristic(nodes[neighborY][neighborX])
+            for i in range(len(open_list)):
+                if opne_list
+    return new_points
+
+def astar_draw(window):
+    global closed_list
+    global open_list
+
+    for i in range(len(open_list)):
+        astar_draw_node(window,open_list[i])
+    for i in range(len(closed_list)):
+        astar_draw_node(window,closed_list[i])
+
+def astar_draw_node(window, node:Node):
+    if(node.cameFrom != None):
+        pygame.draw.line(window,config.BLACK,(node.cameFrom.x,node.cameFrom.y),(node.x,node.y))
+
+    if(node.visited):
+        pygame.draw.circle(window,config.GRAY,(node.x,node.y),3)
+    else:
+        pygame.draw.circle(window,config.YELLOW,(node.x,node.y),3)
